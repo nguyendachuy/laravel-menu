@@ -283,7 +283,12 @@ function updateItem(id = 0) {
     } else {
         // Update all items
         const menuItems = $('.menu-item-settings');
-        const data = { dataItem: [] };
+        const data = { 
+            dataItem: [],
+            menuName: $('#menu-name').val(),
+            menuClass: $('#menu-class').val(),
+            idMenu: $('#idmenu').val()
+        };
         let hasError = false;
         let errorItems = [];
         
@@ -416,10 +421,15 @@ function actualizarMenu(serialize) {
         beforeSend: function() {
             MenuUtils.showLoader();
         },
-        success: function() {
+        success: function(response) {
             // Update dropdown text
             $(`select[name="menu"] option[value="${$('#idmenu').val()}"]`).text(menuName);
-            MenuUtils.showNotification('Menu structure updated successfully', 'success');
+            
+            // Ensure the input fields reflect the current values
+            $('#menu-name').val(menuName);
+            $('#menu-class').val(data.class);
+            
+            MenuUtils.showNotification(__("menu.menu_updated"), 'success');
         },
         error: function(error) {
             console.error('Error updating menu structure:', error);

@@ -116,6 +116,16 @@ class MenuController extends Controller
     {
         $dataItem = $request->input('dataItem');
         
+        // Check if menu information is provided
+        if ($request->has('menuName') && $request->has('idMenu')) {
+            // Update menu name and class
+            $this->menuRepository->updateMenu($request->input('idMenu'), [
+                'name' => $request->input('menuName'),
+                'class' => $request->input('menuClass', '')
+            ]);
+        }
+        
+        // Update menu items
         if (is_array($dataItem)) {
             $this->menuRepository->bulkUpdateMenuItems($dataItem);
         } else {
@@ -126,7 +136,7 @@ class MenuController extends Controller
 
         return response()->json([
             'resp' => 1,
-            'message' => 'Menu item updated successfully'
+            'message' => Lang::get('menu.menu_updated')
         ], 200);
     }
 
