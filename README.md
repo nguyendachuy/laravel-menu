@@ -11,7 +11,9 @@ A modern, responsive drag-and-drop menu builder for Laravel with role-based perm
 - **Drag and Drop Menu Builder**: Intuitive interface with real-time visual feedback
 - **Advanced Reordering System**: Seamlessly reorder menu items with automatic parent-child relationship updates
 - **Multi-level Nested Menus**: Create unlimited depth navigation with proper hierarchy management
+- **Mega Menu Support**: Create rich mega menus with custom content and layouts
 - **Role-based Permissions**: Restrict menu items to specific user roles
+- **Multi-language Support**: Interface available in multiple languages (English, Vietnamese)
 - **Modern JavaScript**: Built with jQuery and Nestable library for smooth interactions
 - **Performance Optimized**: Database query optimizations and efficient data handling
 - **Caching Support**: Optional caching system for improved performance
@@ -39,262 +41,333 @@ php artisan vendor:publish --provider="NguyenHuy\Menu\Providers\MenuServiceProvi
 Open `config/menu.php` to customize these settings:
 
 - **CUSTOM MIDDLEWARE:** Add your own middleware for menu routes
-- **TABLE PREFIX:** Customize database table prefix (default: admin_)
-- **TABLE NAMES:** Change table names if needed
-- **CUSTOM ROUTES:** Customize route paths
-- **ROLE ACCESS:** Enable/disable role-based permissions on menu items
-- **CACHE SETTINGS:**
-  - `cache_enabled`: Enable/disable menu caching (default: false)
-  - `cache_key_prefix`: Prefix for cache keys (default: 'menu')
-  - `cache_ttl`: Time-to-live for cached items in minutes (default: 60)
+- **MENU TABLE PREFIX:** Change the database table prefix (default: 'admin_')
+- **MENU CACHE ENABLED:** Enable/disable menu caching (default: true)
+- **MENU CACHE TTL:** Set cache time-to-live in minutes (default: 1440)
+- **ROLES ENABLED:** Enable/disable role-based menu permissions (default: false)
+- **LOCALIZATION ENABLED:** Enable/disable multi-language support (default: true)
 
-### 4. Run Database Migrations
+### 4. Run Migrations
 
 ```bash
 php artisan migrate
 ```
 
-## Usage
+## Basic Usage
 
-### Basic Menu Builder Interface
+### 1. Access the Menu Manager
 
-Add to your blade template:
+Visit `/admin/menus` in your browser to access the menu manager interface.
+
+### 2. Create a Menu
+
+1. Enter a name for your menu in the "Create New Menu" section
+2. Click "Create Menu"
+
+### 3. Add Menu Items
+
+1. Use the left panel to add new menu items
+2. Fill in the label and URL
+3. Click "Add to Menu"
+
+### 4. Organize Menu Items
+
+1. Drag and drop items to reorder them
+2. Drag items slightly to the right to create child items
+3. Click "Update Menu" to save changes
+
+### 5. Display the Menu in Your Views
 
 ```php
-@extends('app')
-
-@section('contents')
-    {!! Menu::render() !!}
-@endsection
-
-{{-- Add scripts at the end of your body --}}
-@push('scripts')
-    {!! Menu::scripts() !!}
-@endpush
+@if(Menu::exists('main-menu'))
+    {!! Menu::render('main-menu') !!}
+@endif
 ```
 
-### Using the Models
+## Advanced Usage
+
+### Customizing Menu Output
+
+You can customize the menu output by passing a custom view name:
 
 ```php
-use NguyenHuy\Menu\Models\Menus;
-use NguyenHuy\Menu\Models\MenuItems;
+{!! Menu::render('main-menu', 'custom-menu-template') !!}
 ```
 
-### Retrieving Menus
-
-#### Using Model Classes
+### Adding Custom Attributes
 
 ```php
-// Get menu by ID
-$menu = Menus::find(1);
-
-// Or by name
-$menu = Menus::where('name', 'Main Navigation')->first();
-
-// With eager loading (recommended for better performance)
-$menu = Menus::where('name', 'Main Navigation')->with('items')->first();
-
-// Access menu items
-$menuItems = $menu->items;
-
-// Or convert to array
-$menuItemsArray = $menu->items->toArray();
+{!! Menu::render('main-menu', null, ['class' => 'custom-menu', 'id' => 'main-navigation']) !!}
 ```
 
-#### Using Helper Functions
+### Using Multi-language Support
+
+The package supports multiple languages for the admin interface. By default, English and Vietnamese are included.
+
+1. **Enable Localization**
+
+   Make sure localization is enabled in your `config/menu.php` file:
+
+   ```php
+   'localization' => [
+       'enabled' => true,
+       'default_locale' => 'en',
+       'available_locales' => [
+           'en' => 'English',
+           'vi' => 'Tiếng Việt',
+       ],
+   ],
+   ```
+
+2. **Add Your Own Languages**
+
+   You can add your own language files by publishing the translation files:
+
+   ```bash
+   php artisan vendor:publish --tag=laravel-menu-translations
+   ```
+
+   Then create new language files in the `resources/lang/vendor/menu` directory or modify the existing ones in `resources/lang/en/menu.php` and `resources/lang/vi/menu.php`.
+
+3. **Switch Languages**
+
+   You can switch languages using Laravel's built-in localization features:
+
+   ```php
+   // In a controller or middleware
+   App::setLocale('vi'); // Switch to Vietnamese
+   ```
+
+4. **Structure of Language Files**
+
+   The language files contain translations for all user interface elements in the menu manager. Here's an example structure:
+
+   ```php
+   return [
+       // Menu operations
+       'select_menu' => 'Select Menu',
+       'create_new_menu' => 'Create New Menu',
+       'delete_menu' => 'Delete Menu',
+       'update_menu' => 'Update Menu',
+       
+       // Form labels
+       'label' => 'Label',
+       'url' => 'URL',
+       'icon' => 'Icon',
+       'role' => 'Role',
+       
+       // Notifications
+       'menu_created' => 'Menu created successfully',
+       'menu_updated' => 'Menu updated successfully',
+       'menu_deleted' => 'Menu deleted successfully',
+       
+       // JavaScript translations
+       'confirm_delete' => 'Are you sure you want to delete this item?',
+       'yes' => 'Yes',
+       'no' => 'No',
+   ];
+   ```
+
+5. **JavaScript Integration**
+
+   The package automatically passes translations to JavaScript, making it possible to use translated strings in client-side code. This is handled through a data attribute that contains all translations:
+
+   ```html
+   <script id="menu-translations" type="application/json" data-translations='@json(__('menu'))'></script>
+   ```
+
+   In your JavaScript, you can access these translations using the global `__()` function:
+
+   ```javascript
+   // Get a translated string
+   const message = __('menu.confirm_delete');
+   
+   // With replacements
+   const welcomeMessage = __('menu.welcome', {name: 'John'});
+   ```
+
+### Using Role-based Permissions
+
+Enable roles in `config/menu.php`:
 
 ```php
-// Get menu structure by name
-$menuItems = Menu::getByName('Main Navigation');
-
-// Get menu structure by ID
-$menuItems = Menu::get(1);
-
-// Get menu with role filtering
-$menuItems = Menu::getByName('Main Navigation', $roleId);
-
-// Render menu with a custom view
-echo Menu::renderMenu('Main Navigation', 'partials.menu', ['extraData' => $data]);
+'use_roles' => true,
 ```
 
-### Cache Management
+Then configure the role model and fields:
 
 ```php
-// Clear all menu cache
-Menu::clearCache();
-
-// Clear specific menu cache
-$menu = Menus::find(1);
-$menu->clearCache();
+'role_model' => 'App\Models\Role',
+'role_pk' => 'id', // Primary key of the role model
+'role_title_field' => 'name', // Display name field of the role model
 ```
 
-### Display Menu in Blade Templates
+## Mega Menu Support
 
-```php
-<nav class="main-navigation">
-    <ul class="menu">
-        @if(isset($menuItems) && count($menuItems) > 0)
-            @foreach($menuItems as $item)
-                <li class="{{ $item['class'] }}">
-                    <a href="{{ $item['link'] }}" target="{{ $item['target'] }}" 
-                       @if($item['icon']) class="has-icon" @endif>
-                        @if($item['icon'])
-                            <i class="{{ $item['icon'] }}"></i>
-                        @endif
-                        {{ $item['label'] }}
-                    </a>
-                    
-                    @if(isset($item['child']) && count($item['child']) > 0)
-                        <ul class="sub-menu">
-                            @foreach($item['child'] as $child)
-                                <li class="{{ $child['class'] }}">
-                                    <a href="{{ $child['link'] }}" target="{{ $child['target'] }}">
-                                        @if($child['icon'])
-                                            <i class="{{ $child['icon'] }}"></i>
-                                        @endif
-                                        {{ $child['label'] }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </li>
-            @endforeach
-        @endif
-    </ul>
-</nav>
+This package includes support for creating rich mega menus with custom content. Mega menus are useful for displaying complex navigation structures with multiple columns, images, and other rich content.
+
+### Using Mega Menus
+
+1. Edit any menu item
+2. Check the "Enable Mega Menu" option
+3. Add your custom content in the mega menu content area
+4. Save changes
+
+### Integrating WYSIWYG Editors
+
+You can easily integrate WYSIWYG editors like CKEditor, TinyMCE, or Summernote with the mega menu content area. Here's how:
+
+#### 1. Publish the Views
+
+First, publish the package views:
+
+```bash
+php artisan vendor:publish --provider="NguyenHuy\Menu\Providers\MenuServiceProvider" --tag="views"
 ```
 
-### Advanced Menu Methods
+#### 2. Integrate CKEditor (Example)
 
-Get menu items filtered by role:
+Edit the `resources/views/vendor/nguyendachuy-menu/partials/loop-item.blade.php` file:
 
-```php
-$menu = Menus::findByName('Admin Panel');
-$menuItems = $menu->getItemsByRole($roleId);
+```html
+<!-- Find the mega menu content textarea -->
+<div class="mb-3 mega-menu-content-container {{($item['is_mega_menu'] ?? false) ? '' : 'hidden'}}" id="mega-menu-content-{{$item['id']}}">
+    <label class="block mb-1 text-sm font-medium text-gray-700" for="mega-menu-content-{{$item['id']}}">Mega Menu Content</label>
+    <textarea id="mega-menu-content-{{$item['id']}}" rows="5" class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 edit-menu-item-mega-content ckeditor-mega-menu">{{$item['mega_menu_content'] ?? ''}}</textarea>
+    <p class="text-xs text-gray-500 mt-1">You can use HTML to create columns, lists, and other content for your mega menu.</p>
+</div>
 ```
 
-Get the full path of a menu item:
+#### 3. Add JavaScript to Initialize the Editor
 
-```php
-$menuItem = MenuItems::find(5);
-echo $menuItem->getFullPath(); // Parent > Child > Current Item
-```
+Add this to your custom JavaScript file or create a new one:
 
-Check if a menu item has children:
-
-```php
-if ($menuItem->hasChildren()) {
-    // Do something with parent items
-}
-```
-
-Reorder menu items:
-
-```php
-$menuItem->moveUp(); // Move item up in sort order
-$menuItem->moveDown(); // Move item down in sort order
-```
-
-### Parent-Child Relationships
-
-The package correctly tracks and maintains parent-child relationships:
-
-```php
-// Get a menu item's direct parent
-$parent = $menuItem->parentItem;
-
-// Get all siblings of an item
-$siblings = $menuItem->getSiblings();
-
-// Get a menu item's depth level
-$depth = $menuItem->depth;
-
-// Get children of a menu item
-$children = $menuItem->children;
-```
-
-## Registering Menu Items from Other Modules
-
-One of the most powerful features of this package is the ability for other modules to register their own menu items. This allows you to create a centralized menu management system where each module can contribute its own menu items.
-
-### Using the MenuItemsRegistry
-
-The package provides a `MenuItemsRegistry` class that allows other modules to register their menu items:
-
-```php
-use NguyenHuy\Menu\MenuItemsRegistry;
-
-class YourModuleServiceProvider extends \Illuminate\Support\ServiceProvider
-{
-    public function boot()
-    {
-        // Register menu items from your module
-        $this->registerMenuItems();
+```javascript
+// Example for CKEditor
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize CKEditor on all mega menu content areas
+    const megaMenuEditors = document.querySelectorAll('.ckeditor-mega-menu');
+    if (megaMenuEditors.length > 0) {
+        megaMenuEditors.forEach(function(editor) {
+            CKEDITOR.replace(editor.id, {
+                height: 200,
+                toolbar: [
+                    { name: 'document', items: ['Source'] },
+                    { name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'] },
+                    { name: 'editing', items: ['Find', 'Replace', '-', 'SelectAll'] },
+                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+                    { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                    { name: 'links', items: ['Link', 'Unlink', 'Anchor'] },
+                    { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+                    { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
+                    { name: 'colors', items: ['TextColor', 'BGColor'] },
+                    { name: 'tools', items: ['Maximize', 'ShowBlocks'] }
+                ]
+            });
+        });
     }
-    
-    protected function registerMenuItems()
-    {
-        // Register a new section
-        MenuItemsRegistry::registerSection('Your Module Pages', [
-            [
-                'url' => '/your-module/page1',
-                'icon' => 'fa fa-file',
-                'label' => 'Module Page 1',
-            ],
-            [
-                'url' => '/your-module/page2',
-                'icon' => 'fa fa-file',
-                'label' => 'Module Page 2',
-            ],
-        ]);
-        
-        // Add items to an existing section
-        MenuItemsRegistry::addItemsToSection('Pages', [
-            [
-                'url' => '/your-module/custom-page',
-                'icon' => 'fa fa-star',
-                'label' => 'Custom Module Page',
-            ],
-        ]);
-    }
-}
+});
 ```
 
-### Registering Dynamic Menu Items
+#### 4. Include the Required Scripts
 
-You can also register menu items dynamically from your database:
+Add the necessary scripts to your layout or view:
+
+```html
+<!-- For CKEditor -->
+<script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+<script src="path/to/your/custom-mega-menu.js"></script>
+```
+
+#### 5. Alternative Editors
+
+You can use any WYSIWYG editor of your choice. Here are examples for other popular editors:
+
+##### TinyMCE
+
+```javascript
+// Initialize TinyMCE
+tinymce.init({
+    selector: '.edit-menu-item-mega-content',
+    height: 200,
+    plugins: [
+        'advlist autolink lists link image charmap print preview anchor',
+        'searchreplace visualblocks code fullscreen',
+        'insertdatetime media table paste code help wordcount'
+    ],
+    toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help'
+});
+```
+
+##### Summernote
+
+```javascript
+// Initialize Summernote
+$(document).ready(function() {
+    $('.edit-menu-item-mega-content').summernote({
+        height: 200,
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'underline', 'clear']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ]
+    });
+});
+```
+
+### Rendering Mega Menus
+
+When rendering your menu, the mega menu content will be available in the `mega_menu_content` field of each menu item. You can use this to create custom mega menu layouts in your views.
+
+Example custom view for rendering a menu with mega menu support:
 
 ```php
-// Get data from your model
-$pages = YourModule\Models\Page::published()->get();
-
-$menuItems = [];
-foreach ($pages as $page) {
-    $menuItems[] = [
-        'url' => '/your-module/pages/' . $page->slug,
-        'icon' => $page->icon ?? '',
-        'label' => $page->title,
-    ];
-}
-
-// Register dynamic menu items
-if (!empty($menuItems)) {
-    MenuItemsRegistry::registerSection('Dynamic Pages', $menuItems);
-}
+@foreach($menuItems as $item)
+    @if($item['is_mega_menu'])
+        <li class="mega-menu-container {{ $item['class'] }}">
+            <a href="{{ $item['link'] }}" target="{{ $item['target'] }}">
+                @if($item['icon'])
+                    <i class="{{ $item['icon'] }}"></i>
+                @endif
+                {{ $item['label'] }}
+            </a>
+            <div class="mega-menu-content">
+                {!! $item['mega_menu_content'] !!}
+            </div>
+        </li>
+    @else
+        <li class="{{ $item['class'] }}">
+            <a href="{{ $item['link'] }}" target="{{ $item['target'] }}">
+                @if($item['icon'])
+                    <i class="{{ $item['icon'] }}"></i>
+                @endif
+                {{ $item['label'] }}
+            </a>
+            @if(isset($item['children']) && count($item['children']) > 0)
+                <ul>
+                    @include('nguyendachuy-menu::partials.menu-items', ['menuItems' => $item['children']])
+                </ul>
+            @endif
+        </li>
+    @endif
+@endforeach
 ```
 
-### Available Registration Methods
+## Customization
 
-- `registerSection(string $name, array $items, bool $show = false)`: Register a new menu section
-- `addItemsToSection(string $name, array $items)`: Add items to an existing section
-- `getSection(string $name)`: Get a specific section by name
-- `getAllSections()`: Get all registered sections
-- `hasSection(string $name)`: Check if a section exists
+You can customize the views by publishing them and modifying the published files:
 
-### Customization
+```bash
+php artisan vendor:publish --provider="NguyenHuy\Menu\Providers\MenuServiceProvider" --tag="views"
+```
 
-You can customize the menu interface by editing these views:
+This will publish the views to `resources/views/vendor/nguyendachuy-menu/` where you can edit them.
+
+The main views you might want to customize are:
 
 - `resources/views/vendor/nguyendachuy-menu/menu-html.blade.php`
 - `resources/views/vendor/nguyendachuy-menu/partials/left.blade.php`
@@ -306,30 +379,39 @@ You can also customize the CSS styles in:
 
 ## Frontend Customization
 
-The package includes modern styles with CSS variables that can be overridden in your own CSS:
+The package includes modern styles built with Tailwind CSS. You can customize the appearance by overriding the CSS classes in your own stylesheet:
 
 ```css
-:root {
-  --menu-primary: #3b82f6;
-  --menu-primary-hover: #2563eb;
-  --menu-danger: #ef4444;
-  --menu-success: #10b981;
-  --menu-warning: #f59e0b;
-  /* ...and more variables */
+/* Example of customizing menu styles */
+.dd-item .dd-handle {
+  background-color: #3b82f6; /* Change menu item background */
+}
+
+.dd-item .dd-handle:hover {
+  background-color: #2563eb; /* Change menu item hover state */
+}
+
+.menu-item-settings {
+  background-color: #f9fafb; /* Change settings panel background */
+  border-color: #e5e7eb; /* Change border color */
 }
 ```
 
 ## Loading Indicator
 
-The package features a modern top-of-page loading indicator that provides visual feedback during AJAX operations:
+The package features a modern top-of-page loading indicator that provides visual feedback during AJAX operations. You can customize its appearance by overriding these CSS classes in your stylesheet:
 
 ```css
 #ajax_loader {
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+  background-color: #3b82f6; /* Change the color of the loading bar */
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.7); /* Change the glow effect */
+  height: 3px; /* Change the height of the loading bar */
+}
+
+#ajax_loader.loading {
+  animation: loadingProgress 2s ease-in-out infinite; /* Customize the animation */
 }
 ```
-
-You can customize its appearance by overriding these CSS classes.
 
 ## Security and Error Handling
 
@@ -348,12 +430,7 @@ The package includes database optimizations:
 - Indexes on frequently queried columns
 - Composite indexes for common query patterns
 - Efficient depth and parent-child tracking
-- Query caching options
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This package is open-sourced software licensed under the MIT license.
+This Laravel Menu Manager is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

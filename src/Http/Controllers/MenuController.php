@@ -5,6 +5,7 @@ namespace NguyenHuy\Menu\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Lang;
 use NguyenHuy\Menu\Events\CreatedMenuEvent;
 use NguyenHuy\Menu\Events\DestroyMenuEvent;
 use NguyenHuy\Menu\Events\UpdatedMenuEvent;
@@ -39,7 +40,7 @@ class MenuController extends Controller
 
         return response()->json([
             'resp' => $menu->id,
-            'message' => 'Menu created successfully'
+            'message' => Lang::get('menu.menu_created')
         ], 200);
     }
 

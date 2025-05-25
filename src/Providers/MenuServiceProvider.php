@@ -23,6 +23,7 @@ class MenuServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->registerPublishables();
         $this->registerAssets();
+        $this->registerTranslations();
     }
 
     /**
@@ -175,6 +176,22 @@ class MenuServiceProvider extends ServiceProvider
     protected function registerHelpers(): void
     {
         // Legacy helpers registration - kept for backward compatibility
+    }
+    
+    /**
+     * Register translations
+     * 
+     * @return void
+     */
+    protected function registerTranslations(): void
+    {
+        // Load translations from the package
+        $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'menu');
+        
+        // Publish translations
+        $this->publishes([
+            __DIR__ . '/../../resources/lang' => resource_path('lang/vendor/menu'),
+        ], 'laravel-menu-translations');
     }
 
     /**

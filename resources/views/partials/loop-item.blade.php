@@ -43,6 +43,20 @@
             </select>
         </div>
 
+        <div class="mb-3">
+            <div class="flex items-center">
+                <input type="checkbox" id="is-mega-menu-{{$item['id']}}" class="mr-2 edit-menu-item-mega" {{($item['is_mega_menu'] ?? false) ? 'checked' : ''}}>
+                <label class="text-sm font-medium text-gray-700" for="is-mega-menu-{{$item['id']}}">Enable Mega Menu</label>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Turn this menu item into a mega menu with custom content.</p>
+        </div>
+
+        <div class="mb-3 mega-menu-content-container {{($item['is_mega_menu'] ?? false) ? '' : 'hidden'}}" id="mega-menu-content-{{$item['id']}}">
+            <label class="block mb-1 text-sm font-medium text-gray-700" for="mega-menu-content-{{$item['id']}}">Mega Menu Content</label>
+            <textarea id="mega-menu-content-{{$item['id']}}" rows="5" class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 edit-menu-item-mega-content wysiwyg-editor">{{$item['mega_menu_content'] ?? ''}}</textarea>
+            <p class="text-xs text-gray-500 mt-1">You can use HTML to create columns, lists, and other content for your mega menu. For a visual editor, integrate a WYSIWYG editor like CKEditor or TinyMCE (see README for instructions).</p>
+        </div>
+
         @if(config('menu.use_roles'))
         <div class="mb-3">
             <label class="block mb-1 text-sm font-medium text-gray-700" for="role_menu_{{$item['id']}}">Role</label>

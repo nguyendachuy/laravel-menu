@@ -10,6 +10,24 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Localization Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Enable or disable localization support for the menu builder.
+    | When enabled, menu items can be translated to different languages.
+    |
+    */
+    'localization' => [
+        'enabled' => true,           // Enable or disable localization support
+        'default_locale' => 'en',    // Default locale when no locale is specified
+        'available_locales' => [     // Available locales for the menu builder
+            'en' => 'English',
+            'vi' => 'Tiếng Việt',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Menu Middleware
     |--------------------------------------------------------------------------
     |
@@ -66,15 +84,4 @@ return [
     'cache_enabled' => false,  // Enable or disable menu caching
     'cache_key_prefix' => 'menu', // Prefix for cache keys
     'cache_ttl' => 60,         // Cache time-to-live in minutes
-
-    /*
-    |--------------------------------------------------------------------------
-    | Legacy configuration for backward compatibility
-    |--------------------------------------------------------------------------
-    */
-    'cache' => [
-        'enabled' => false,    // Enable or disable cache (legacy format)
-        'minutes' => 60,       // Cache time in minutes (legacy format)
-        'prefix' => 'menu',    // Prefix for cache key (legacy format)
-    ]
 ];

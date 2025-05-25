@@ -169,6 +169,15 @@ class MenuRepository
                 'target' => $data['target']
             ];
             
+            // Add mega menu fields if provided
+            if (isset($data['is_mega_menu'])) {
+                $updateData['is_mega_menu'] = $data['is_mega_menu'];
+            }
+            
+            if (isset($data['mega_menu_content'])) {
+                $updateData['mega_menu_content'] = $data['mega_menu_content'];
+            }
+            
             // Add depth information if provided
             if (isset($data['depth'])) {
                 $updateData['depth'] = $data['depth'];

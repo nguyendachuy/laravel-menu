@@ -47,10 +47,10 @@ class CacheableQueryBuilder extends Builder
         parent::__construct($connection, $grammar, $processor);
         $this->modelClass = $modelClass ?? static::class;
 
-        // Load configuration values from the menu.cache configuration file
-        $this->minutes = config('menu.cache.minutes', $this->minutes);
-        $this->enabled = config('menu.cache.enabled', $this->enabled);
-        $this->prefix = config('menu.cache.prefix', $this->prefix);
+        // Load configuration values from the menu configuration file
+        $this->minutes = config('menu.cache_ttl', $this->minutes);
+        $this->enabled = config('menu.cache_enabled', $this->enabled);
+        $this->prefix = config('menu.cache_key_prefix', $this->prefix);
     }
 
 

@@ -20,7 +20,8 @@ class MenuItems extends Model
      */
     protected $fillable = [
         'label', 'link', 'parent', 'sort', 'class', 
-        'menu', 'depth', 'role_id', 'icon', 'target'
+        'menu', 'depth', 'role_id', 'icon', 'target',
+        'is_mega_menu', 'mega_menu_content'
     ];
 
     /**
@@ -145,9 +146,17 @@ class MenuItems extends Model
      */
     public function scopeByRole(Builder $query, int $roleId): Builder
     {
+        if ($roleId === 0) {
+            return $query->where(function (Builder $q) {
+                $q->whereNull('role_id')
+                  ->orWhere('role_id', 0);
+            });
+        }
+        
         return $query->where(function (Builder $q) use ($roleId) {
             $q->where('role_id', $roleId)
-              ->orWhere('role_id', 0);
+              ->orWhere('role_id', 0)
+              ->orWhereNull('role_id');
         });
     }
 

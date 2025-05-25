@@ -33,9 +33,9 @@
                     
                     @if(config('menu.use_roles'))
                         <div class="mb-4">
-                            <label class="block mb-1 text-sm font-medium text-gray-700">Role</label>
+                            <label class="block mb-1 text-sm font-medium text-gray-700">{{ __('menu.role') }}</label>
                             <select name="role" class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="0">Select Role</option>
+                                <option value="0">{{ __('menu.select_role') }}</option>
                                 @foreach($roles as $role)
                                 <option value="{{ $role->$role_pk }}">{{ ucfirst($role->$role_title_field) }}</option>
                                 @endforeach
@@ -48,12 +48,12 @@
                         onclick="addItemMenu(this, 'custom');" 
                         class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
                     >
-                        Add to Menu
+                        {{ __('menu.add_to_menu') }}
                     </button>
                 </form>
             @else
                 <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                    No items available.
+                    {{ __('menu.no_items_available') }}
                 </div>
             @endif
         </div>

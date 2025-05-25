@@ -432,15 +432,4 @@
   transition: height 0.2s ease-in-out;
 }
 
-/* Variables for customization */
-:root {
-  --menu-primary: #3b82f6;
-  --menu-primary-hover: #2563eb;
-  --menu-danger: #ef4444;
-  --menu-success: #10b981;
-  --menu-warning: #f59e0b;
-  --menu-text: #374151;
-  --menu-border: #e5e7eb;
-  --menu-bg: #ffffff;
-  --menu-bg-alt: #f9fafb;
-}
+/* End of styles */

@@ -3,6 +3,26 @@
  * Uses jQuery for compatibility with Nestable2
  */
 
+// Translations object - will be populated from the backend
+let translations = {};
+
+/**
+ * Get a translated string
+ * @param {string} key - Translation key
+ * @param {object} replacements - Optional replacements
+ * @returns {string} - Translated string
+ */
+function __(key, replacements = {}) {
+    let string = translations[key] || key;
+    
+    // Replace placeholders
+    Object.keys(replacements).forEach(placeholder => {
+        string = string.replace(`:${placeholder}`, replacements[placeholder]);
+    });
+    
+    return string;
+}
+
 // Utilities
 const MenuUtils = {
     /**
@@ -73,16 +93,19 @@ const MenuUtils = {
      * @param {string} message - Confirmation message
      * @returns {Promise} - Promise that resolves to boolean (true if confirmed)
      */
-    showConfirmation(message) {
-        return new Promise((resolve) => {
-            // Create overlay and dialog
-            const overlay = $(`
-                <div class="menu-overlay">
-                    <div class="menu-confirmation">
-                        <div class="confirmation-message">${message}</div>
-                        <div class="confirmation-buttons">
-                            <button class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm confirm-yes">Yes, confirm</button>
-                            <button class="px-4 py-2 bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 rounded text-sm confirm-no">Cancel</button>
+    async showConfirmation(message) {
+        return new Promise(resolve => {
+            // Remove existing confirmation if present
+            $('.menu-confirmation').remove();
+            
+            // Create confirmation markup
+            const confirmation = $(`
+                <div class="menu-confirmation">
+                    <div class="confirmation-content">
+                        <p>${message}</p>
+                        <div class="confirmation-actions">
+                            <button class="confirm-yes">${__('menu.yes')}</button>
+                            <button class="confirm-no">${__('menu.no')}</button>
                         </div>
                     </div>
                 </div>
@@ -219,6 +242,10 @@ function updateItem(id = 0) {
         const siblings = $item.parent().children('.dd-item');
         const sortOrder = siblings.index($item);
         
+        // Check if mega menu is enabled
+        const isMegaMenu = $('#is-mega-menu-' + id).is(':checked');
+        const megaMenuContent = $('#mega-menu-content-' + id).val();
+        
         const data = {
             id: id,
             label: labelInput.val(),
@@ -229,7 +256,9 @@ function updateItem(id = 0) {
             depth: depth, // Add the depth information
             parent: parentId, // Add parent ID
             sort: sortOrder, // Add sort order
-            role_id: roleSelect.length ? roleSelect.val() : 0
+            role_id: roleSelect.length ? roleSelect.val() : 0,
+            is_mega_menu: isMegaMenu ? 1 : 0,
+            mega_menu_content: megaMenuContent
         };
         
         $.ajax({
@@ -324,7 +353,7 @@ function updateItem(id = 0) {
  * @param {number} id - ID of the item to delete
  */
 async function deleteItem(id) {
-    const confirmed = await MenuUtils.showConfirmation('Are you sure you want to delete this menu item?');
+    const confirmed = await MenuUtils.showConfirmation(__('menu.confirm_delete_menu_item'));
     
     if (confirmed) {
         $.ajax({
@@ -447,14 +476,14 @@ function createNewMenu() {
             MenuUtils.showLoader();
         },
         success: function(response) {
-            MenuUtils.showNotification('Menu created successfully. Redirecting...', 'success');
+            MenuUtils.showNotification(__('menu.menu_created') + '. ' + __('menu.redirecting') + '...', 'success');
             setTimeout(() => {
                 window.location.href = `${URL_CURRENT}?menu=${response.resp}`;
             }, 1000);
         },
         error: function(error) {
             console.error('Error creating menu:', error);
-            MenuUtils.showNotification('Error creating menu. Please try again.', 'error');
+            MenuUtils.showNotification(__('menu.error_occurred') + '. ' + __('menu.please_try_again'), 'error');
         },
         complete: function() {
             MenuUtils.hideLoader();
@@ -466,7 +495,7 @@ function createNewMenu() {
  * Delete the current menu
  */
 async function deleteMenu() {
-    const confirmed = await MenuUtils.showConfirmation('Are you sure you want to delete this menu and all its items?');
+    const confirmed = await MenuUtils.showConfirmation(__('menu.confirm_delete_menu'));
     
     if (confirmed) {
         $.ajax({
@@ -487,7 +516,7 @@ async function deleteMenu() {
             },
             error: function(error) {
                 console.error('Error deleting menu:', error);
-                MenuUtils.showNotification('Error deleting menu. Please try again.', 'error');
+                MenuUtils.showNotification(__('menu.error_occurred') + '. ' + __('menu.please_try_again'), 'error');
             },
             complete: function() {
                 MenuUtils.hideLoader();
@@ -496,8 +525,34 @@ async function deleteMenu() {
     }
 }
 
+// Toggle mega menu content visibility when checkbox is clicked
+function toggleMegaMenuContent() {
+    $(document).on('change', '[id^="is-mega-menu-"]', function() {
+        const id = $(this).attr('id').replace('is-mega-menu-', '');
+        const contentContainer = $('#mega-menu-content-' + id).closest('.mega-menu-content-container');
+        
+        if ($(this).is(':checked')) {
+            contentContainer.removeClass('hidden');
+        } else {
+            contentContainer.addClass('hidden');
+        }
+    });
+}
+
 // Initialize when document is ready
 $(document).ready(function() {
+    // Load translations from data attribute
+    if ($('#menu-translations').length) {
+        try {
+            translations = JSON.parse($('#menu-translations').attr('data-translations'));
+        } catch (e) {
+            console.error('Error parsing translations:', e);
+        }
+    }
+    
+    // Initialize mega menu toggle functionality
+    toggleMegaMenuContent();
+    
     // Initialize nestable with proper configuration for sub-items
     if ($('#nestable').length) {
         // Initialize Nestable
