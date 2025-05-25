@@ -80,7 +80,7 @@ class WMenu
             ->orderBy('name')
             ->get()
             ->pluck('name', 'id')
-            ->prepend('Select menu', 0)
+            ->prepend(__('menu.select_menu'), 0)
             ->all();
     }
 
@@ -105,7 +105,9 @@ class WMenu
                 'menus' => $menus, 
                 'indmenu' => $menu, 
                 'menulist' => $menulist,
-                'menuSections' => $menuSections
+                'menuSections' => $menuSections,
+                'locale' => app()->getLocale(),
+                'available_locales' => config('menu.localization.available_locales', [])
             ];
             
             // Add roles data if enabled
@@ -119,7 +121,9 @@ class WMenu
             return view('nguyendachuy-menu::menu-html', [
                 'menulist' => $menulist,
                 'menuSections' => MenuItemsRegistry::getAllSections(),
-                'error' => 'The selected menu was not found. Please choose another menu or create a new one.'
+                'error' => __('menu.menu_not_found'),
+                'locale' => app()->getLocale(),
+                'available_locales' => config('menu.localization.available_locales', [])
             ]);
         }
     }
@@ -171,7 +175,13 @@ class WMenu
      */
     public function scripts(): ViewInstance
     {
-        return view('nguyendachuy-menu::scripts');
+        // Ensure the correct locale is set
+        app()->setLocale(config('menu.localization.enabled') ? config('app.locale') : config('menu.localization.default_locale'));
+        
+        return view('nguyendachuy-menu::scripts', [
+            'locale' => app()->getLocale(),
+            'translations' => __('menu')
+        ]);
     }
 
     /**

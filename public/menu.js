@@ -13,7 +13,11 @@ let translations = {};
  * @returns {string} - Translated string
  */
 function __(key, replacements = {}) {
-    let string = translations[key] || key;
+    // Remove 'menu.' prefix if present
+    const actualKey = key.startsWith('menu.') ? key.substring(5) : key;
+    
+    // Get translation or fallback to key
+    let string = translations[actualKey] || key;
     
     // Replace placeholders
     Object.keys(replacements).forEach(placeholder => {
@@ -93,19 +97,16 @@ const MenuUtils = {
      * @param {string} message - Confirmation message
      * @returns {Promise} - Promise that resolves to boolean (true if confirmed)
      */
-    async showConfirmation(message) {
-        return new Promise(resolve => {
-            // Remove existing confirmation if present
-            $('.menu-confirmation').remove();
-            
-            // Create confirmation markup
-            const confirmation = $(`
-                <div class="menu-confirmation">
-                    <div class="confirmation-content">
-                        <p>${message}</p>
-                        <div class="confirmation-actions">
-                            <button class="confirm-yes">${__('menu.yes')}</button>
-                            <button class="confirm-no">${__('menu.no')}</button>
+    showConfirmation(message) {
+        return new Promise((resolve) => {
+            // Create overlay and dialog
+            const overlay = $(`
+                <div class="menu-overlay">
+                    <div class="menu-confirmation">
+                        <div class="confirmation-message">${message}</div>
+                        <div class="confirmation-buttons">
+                            <button class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm confirm-yes">${__('menu.yes')}</button>
+                            <button class="px-4 py-2 bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 rounded text-sm confirm-no">${__('menu.no')}</button>
                         </div>
                     </div>
                 </div>
@@ -541,13 +542,21 @@ function toggleMegaMenuContent() {
 
 // Initialize when document is ready
 $(document).ready(function() {
-    // Load translations from data attribute
-    if ($('#menu-translations').length) {
+    // Load translations from global variable or data attribute
+    if (window.NDHuyMenu && window.NDHuyMenu.translations) {
+        // First priority: use translations from global variable
+        translations = window.NDHuyMenu.translations;
+        console.log('Translations loaded from global variable:', translations);
+    } else if ($('#menu-translations').length) {
+        // Second priority: use translations from data attribute
         try {
             translations = JSON.parse($('#menu-translations').attr('data-translations'));
+            console.log('Translations loaded from data attribute:', translations);
         } catch (e) {
             console.error('Error parsing translations:', e);
         }
+    } else {
+        console.warn('No translations found. Using default keys.');
     }
     
     // Initialize mega menu toggle functionality

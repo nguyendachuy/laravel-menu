@@ -23,6 +23,14 @@
             'X-CSRF-TOKEN': "{{ csrf_token() }}"
         }
     });
+    
+    // Set up translations for JavaScript
+    window.{{ $jsNamespace }} = window.{{ $jsNamespace }} || {};
+    window.{{ $jsNamespace }}.locale = "{{ $locale }}";
+    window.{{ $jsNamespace }}.translations = @json($translations);
 </script>
 <script type="text/javascript" src="//cdn.jsdelivr.net/npm/nestable2@1.6.0/jquery.nestable.min.js"></script>
 <script type="text/javascript" src="{{ nguyendachuy_menu_asset('menu.js') }}"></script>
+
+<!-- Add translation data for JavaScript -->
+<div id="menu-translations" data-translations="{{ json_encode($translations) }}" style="display: none;"></div>
