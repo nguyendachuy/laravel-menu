@@ -1,340 +1,446 @@
-#nguyen-huy ul {
-    list-style: none;
-}
-
-#nguyen-huy .menu-item-handle {
-    cursor: move;
-}
-
-#nguyen-huy .menu-item-handle .menu-item-title.no-title {
-    color: #999;
-}
-
-#nguyen-huy #nestable .card {
-    border: none;
-}
-
-#nguyen-huy a,
-#nguyen-huy .btn-link {
-    color: rgb(15, 63, 196);
-}
-
-#nguyen-huy a:hover,
-#nguyen-huy .btn-link {
-    text-decoration: none;
-}
-
-#nguyen-huy #accordion-left .card-header {
-    padding: 0px;
-}
-
-#nguyen-huy #accordion-left .card {
-    margin-top: 10px;
-}
-
-#nguyen-huy #accordion-left .btn-link {
-    width: 100%;
-    text-align: left;
-}
-
-#nguyen-huy .card-header {
-    background-color: #e9ecef;
-}
 /**
-	Fixes for boostrap 4.3.1*/
-#nguyen-huy .card-header {
-    display: block;
-}
-
-#nguyen-huy .jumbotron .container {
-    padding-top: 5px;
-}
-
-#accordion-left .collapsed .narrow-icon:before {
-    content: "\f107"
-}
-
-#accordion-left button[aria-expanded=true] .narrow-icon:before,
-#nguyen-huy div[aria-expanded=true] .narrow-icon:before {
-    content: "\f106"
-}
-/**
- * Nestable
+ * Laravel Menu Manager - Tailwind CSS Styles
  */
+
+@import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+
+/* Loading Indicator */
+#ajax_loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #3b82f6;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.3s ease-out;
+  z-index: 9999;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+}
+
+#ajax_loader.loading {
+  animation: loadingProgress 2s ease-in-out infinite;
+}
+
+@keyframes loadingProgress {
+  0% {
+    transform: scaleX(0);
+  }
+  50% {
+    transform: scaleX(0.5);
+  }
+  80% {
+    transform: scaleX(0.7);
+  }
+  95% {
+    transform: scaleX(0.9);
+  }
+  100% {
+    transform: scaleX(0.95);
+  }
+}
+
+#ajax_loader.loaded {
+  transform: scaleX(1) !important;
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.5s 0.3s ease-out;
+}
+
+/* Enhanced Nestable styles */
+.dd {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 20px;
+}
+
 .dd-list {
-    display: block;
-    position: relative;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .dd-list .dd-list {
-    padding-left: 30px;
-    margin-top: 5px;
+  padding-left: 30px; /* Indent for nested items */
+  border-left: 2px dashed #e5e7eb;
+  margin-left: 5px;
 }
 
-.dd-collapsed .dd-list {
-    display: none;
+.dd-empty {
+  padding: 30px;
+  border: 2px dashed #e5e7eb;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  position: relative;
 }
 
-.dd-item,
-.dd-empty,
-.dd-placeholder {
-    display: block;
-    position: relative;
-    margin: 0;
-    padding: 0;
-    min-height: 20px;
-    font-size: 13px;
-    line-height: 20px;
+.dd-empty::after {
+  content: 'Drag items here';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #9ca3af;
+  font-weight: 500;
 }
 
+.dd-item {
+  display: block;
+  position: relative;
+  margin-bottom: 12px;
+  min-height: 20px;
+  transition: all 0.2s ease;
+}
+
+/* Add specific style for non-draggable elements */
+.dd-nodrag {
+  cursor: default;
+}
+
+.dd-nodrag button {
+  cursor: pointer;
+}
+
+/* Ensure the handle area is clearly identifiable */
 .dd-handle {
-    cursor: move;
-    color: #333;
-    text-decoration: none;
-    background: #fafafa;
-    padding: 13px;
-    margin-left: -20px;
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #374151;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  cursor: move;
+  cursor: -webkit-grab;
+  cursor: grab;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .dd-handle:hover {
-    color: #2ea8e5;
-    background: #fff;
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
 }
 
-.dd-item>button {
-    display: block;
-    position: relative;
-    cursor: pointer;
-    float: left;
-    width: 25px;
-    height: 20px;
-    margin: 7px 0;
-    padding: 0;
-    text-indent: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    border: 0;
-    background: transparent;
-    font-size: 10px;
-    line-height: 1;
-    text-align: center;
-    font-weight: bold;
+.dd-handle:active {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
 }
 
-.dd-item>button:before {
-    content: '\f067';
-    display: block;
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    text-indent: 0;
-    font-family: 'FontAwesome'
+/* Visual indicator for depth levels */
+.dd-item {
+  position: relative;
 }
 
-.dd-item>button[data-action="collapse"]:before {
-    content: '\f068';
+.dd-item::before {
+  content: '';
+  position: absolute;
+  left: -15px;
+  top: 0;
+  height: 100%;
+  border-left: 0;
+  transition: all 0.2s ease;
 }
 
-.dd-placeholder,
-.dd-empty {
-    margin: 5px 0;
-    padding: 0;
-    min-height: 30px;
-    background: #f2fbff;
-    border: 1px dashed #b6bcbf;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
+.dd-item[data-depth="1"]::before {
+  left: -15px;
+  border-left: 2px solid #e5e7eb;
 }
 
-.dd-empty {
-    border: 1px dashed #bbb;
-    min-height: 100px;
-    background-color: #e5e5e5;
-    background-size: 60px 60px;
-    background-position: 0 0, 30px 30px;
+.dd-item[data-depth="2"]::before {
+  left: -15px;
+  border-left: 2px solid #d1d5db;
+}
+
+.dd-item[data-depth="3"]::before {
+  left: -15px;
+  border-left: 2px solid #9ca3af;
+}
+
+/* Improve menu item title display */
+.menu-item-title {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.menu-item-link {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.menu-item-depth {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-left: 8px;
+  padding: 2px 6px;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+}
+
+.dd-handle:active {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+
+.dd-handle:hover {
+  color: #2563eb;
+  background-color: #ffffff;
+}
+
+/* Placeholder shown during drag */
+.dd-placeholder {
+  position: relative;
+  margin: 5px 0;
+  padding: 0;
+  min-height: 30px;
+  background: #f0f9ff;
+  border: 1px dashed #93c5fd;
+  border-radius: 3px;
+  box-sizing: border-box;
 }
 
 .dd-dragel {
-    position: absolute;
-    pointer-events: none;
-    z-index: 9999;
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
 }
 
-.dd-dragel>.dd-item .dd-handle {
-    margin-top: 0;
+.dd-dragel > .dd-item .dd-handle {
+  margin-top: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.dd-dragel .dd-handle {
-    -webkit-box-shadow: 2px 4px 6px 0 rgba(0, 0, 0, .1);
-    box-shadow: 2px 4px 6px 0 rgba(0, 0, 0, .1);
+/* Expand/collapse buttons - REMOVING FIXED POSITION */
+.dd-expand, 
+.dd-collapse {
+  display: inline-block;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  line-height: 18px;
+  padding: 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+  float: left;
+  margin-right: 5px;
 }
 
-.dd-hover>.dd-handle {
-    background: #2ea8e5 !important;
+.dd-expand:hover,
+.dd-collapse:hover {
+  background: #f9fafb;
 }
 
-/**
- * Nestable Draggable Handles
- */
-
-.dd3-content {
-    display: block;
-    height: 30px;
-    margin: 5px 0;
-    padding: 5px 10px 5px 40px;
-    color: #333;
-    text-decoration: none;
-    font-weight: 400;
-    border: 1px solid #ccc;
-    background: #fafafa;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
+/* Menu item depth indicator */
+.menu-item-depth {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-left: 0.5rem;
 }
 
-.dd3-content:hover {
-    color: #2ea8e5;
-    background: #fff;
+/* Menu item styles */
+.menu-item-title {
+  font-weight: 600;
 }
 
-.dd-dragel>.dd3-item>.dd3-content {
-    margin: 0;
+.menu-item-link {
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
-.dd3-item>button {
-    margin-left: 30px;
+/* Settings panel */
+.menu-item-settings {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0.25rem;
 }
 
-.dd3-handle {
-    position: absolute;
-    margin: 0;
-    left: 0;
-    top: 0;
-    cursor: move;
-    width: 30px;
-    text-indent: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    border: 1px solid #aaa;
-    background: #ddd;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+/* Notifications */
+.menu-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+  z-index: 9999;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+  max-width: 400px;
+  animation: slideIn 0.3s ease-in-out;
 }
 
-.dd3-handle:before {
-    content: '≡';
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 3px;
-    width: 100%;
-    text-align: center;
-    text-indent: 0;
-    color: #fff;
-    font-size: 20px;
-    font-weight: normal;
+.menu-notification.success {
+  background-color: #10b981;
 }
 
-.dd3-handle:hover {
-    background: #ddd;
+.menu-notification.error {
+  background-color: #ef4444;
 }
 
-/*
-* loading
-*/
-.ajax-loader {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    display: none;
-    z-index: 9999989;
+.menu-notification.warning {
+  background-color: #f59e0b;
+  color: #1f2937;
 }
 
-.lds-ripple {
-    display: inline-block;
-    position: relative;
-    width: 80px;
-    height: 80px;
+.menu-notification.info {
+  background-color: #3b82f6;
 }
 
-.lds-ripple div {
-    position: absolute;
-    border: 4px solid #da3ad8;
+.menu-notification .notification-icon {
+  display: inline-block;
+  margin-right: 12px;
+  font-size: 18px;
+}
+
+.menu-notification .notification-close {
+  margin-left: auto;
+  cursor: pointer;
+  font-size: 20px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.menu-notification .notification-close:hover {
+  opacity: 1;
+}
+
+.menu-notification.fade-out {
+  opacity: 0;
+  transform: translateX(10px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
     opacity: 1;
-    border-radius: 50%;
-    animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  }
 }
 
-.lds-ripple div:nth-child(2) {
-    animation-delay: -0.5s;
+/* Confirmation dialogs */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.2s;
 }
 
-@keyframes lds-ripple {
-    0% {
-        top: 36px;
-        left: 36px;
-        width: 0;
-        height: 0;
-        opacity: 1;
-    }
-
-    100% {
-        top: 0px;
-        left: 0px;
-        width: 72px;
-        height: 72px;
-        opacity: 0;
-    }
-}
-.box-links-for-menu {
-    padding: 0px;
+.menu-confirmation {
+  background-color: white;
+  border-radius: 0.25rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 1.5rem;
+  max-width: 28rem;
+  width: 100%;
+  animation: zoomIn 0.2s;
 }
 
-.box-links-for-menu .list-item {
-    border: 1px solid #ddd;
-    max-height: 200px;
-    overflow: auto;
-    padding: 15px
+.confirmation-message {
+  margin-bottom: 1.25rem;
+  font-size: 1rem;
 }
 
-.box-links-for-menu .list-item .list-item {
-    border: 0;
-    max-height: none;
-    overflow: visible;
-    padding: 0 0 0 20px
+.confirmation-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
 }
 
-.box-links-for-menu .list-item li {
-    list-style: none;
-    margin-bottom: 5px;
-    position: relative
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.box-links-for-menu .list-item li ul {
-    padding-left: 20px
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.box-links-for-menu .list-item li .checker {
-    margin-top: -25px
+/* Additional utility classes */
+.collapse {
+  display: none;
 }
 
-.box-links-for-menu .list-item li label {
-    max-width: 80%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap
+.collapse.show {
+  display: block;
 }
 
-.box-links-for-menu .list-item li a {
-    display: inline-block;
-    overflow: hidden;
-    padding-left: 20px;
-    text-overflow: ellipsis;
-    -ms-text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 100%
+/* Collapse functionality - FIXING */
+.collapse-header {
+  position: relative;
+  cursor: pointer;
+}
+
+.collapse-header::after {
+  content: "+";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.collapse-header.expanded::after {
+  content: "-";
+}
+
+.collapse-content {
+  overflow: hidden;
+  transition: height 0.2s ease-in-out;
+}
+
+/* Variables for customization */
+:root {
+  --menu-primary: #3b82f6;
+  --menu-primary-hover: #2563eb;
+  --menu-danger: #ef4444;
+  --menu-success: #10b981;
+  --menu-warning: #f59e0b;
+  --menu-text: #374151;
+  --menu-border: #e5e7eb;
+  --menu-bg: #ffffff;
+  --menu-bg-alt: #f9fafb;
 }

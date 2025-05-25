@@ -1,72 +1,61 @@
-@php
-    $id = rand(100000, 999999);
-@endphp
-<div class="card">
-    <div class="card-header" id="heading-{{$id}}">
-        <h5 class="mb-0">
-            <button class="btn btn-link" data-toggle="collapse" 
-            data-target="#collapse{{$id}}" 
-            aria-expanded="true" aria-controls="collapse{{$id}}">
-                {{$name}}
-                <i class="fa fa-angle-down narrow-icon float-right"></i>
-            </button>
-        </h5>
+<div class="bg-white shadow rounded border border-gray-200  mt-6">
+    <!-- Accordion header -->
+    <div 
+        class="px-4 py-3 bg-gray-50 border-b border-gray-200 collapse-header flex justify-between items-center {{ $show ?? false ? 'expanded' : '' }}"
+        data-toggle="collapse" 
+        data-target="#collapse-{{ Str::slug($name) }}"
+        aria-expanded="{{ $show ?? false ? 'true' : 'false' }}"
+    >
+        <h5 class="font-medium text-gray-700">{{ $name }}</h5>
     </div>
-
-    <div id="collapse{{$id}}" class="collapse @isset($show) show @endisset" 
-    aria-labelledby="heading{{$id}}" 
-    data-parent="#accordion">
-        <div class="card-body box-links-for-menu">
-            <form method="get" action="">
-                <div class="form-group">
-                    <ul class="list-item">
-                        @foreach ($urls as $key => $item)
-                        <li>
-                            <label for="menu-link-{{$id}}-{{$key}}">
+    
+    <!-- Accordion content -->
+    <div id="collapse-{{ Str::slug($name) }}" class="{{ $show ?? false ? 'block' : 'hidden' }}">
+        <div class="p-4">
+            @if(count($urls))
+                <form id="add-page">
+                    <div class="mb-4">
+                        @foreach($urls as $key => $item)
+                            <div class="flex items-center mb-2">
                                 <input 
-                                id="menu-link-{{$id}}-{{$key}}"
-                                class="" type="checkbox" name="menu_id"
-                                value="{{$item['url']}}" 
-                                data-icon="{{$item['icon']}}"
-                                data-url="{{$item['url']}}"
-                                data-label="{{$item['label']}}"
+                                    type="checkbox" 
+                                    name="menu_id" 
+                                    value="{{ $key }}" 
+                                    class="mr-2" 
+                                    data-icon="{{ $item['icon'] ?? '' }}" 
+                                    data-label="{{ $item['label'] }}" 
+                                    data-url="{{ $item['url'] }}"
                                 >
-                                {{$item['label']}}
-                            </label>
-                        </li>
+                                <label>{{ $item['label'] }}</label>
+                            </div>
                         @endforeach
-                    </ul>
-                    <!-- <select name="pages" class="form-control data-select" required> -->
-                    {{-- <select name="pages[]" multiple class="form-control data-select" required>
-                        @foreach ($urls as $item)
-                            <option 
-                                value="{{$item['url']}}" 
-                                data-icon="{{$item['icon']}}"
-                                data-url="{{$item['url']}}"
-                                >{{$item['label']}}</option>
-                        @endforeach
-                    </select> --}}
-                </div>
-                @if(!empty($roles))
-                <div class="form-group">
-                    <label for="role">Example select</label>
-                    <select class="form-control" name="role">
-                        <option value="0">Select Role</option>
-                        @foreach($roles as $role)
-                            <option value="{{ $role->$role_pk }}">
-                                {{ ucfirst($role->$role_title_field) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                @endif
-                <div class="form-group">
-                    <button type="button" onclick="addItemMenu(this, 'custom')" 
-                    class="btn btn-info btn-sm float-right mr-2 mb-2">
+                    </div>
+                    
+                    @if(config('menu.use_roles'))
+                        <div class="mb-4">
+                            <label class="block mb-1 text-sm font-medium text-gray-700">Role</label>
+                            <select name="role" class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="0">Select Role</option>
+                                @foreach($roles as $role)
+                                <option value="{{ $role->$role_pk }}">{{ ucfirst($role->$role_title_field) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+                    
+                    <button 
+                        type="button" 
+                        onclick="addItemMenu(this, 'custom');" 
+                        class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    >
                         Add to Menu
                     </button>
+                </form>
+            @else
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+                    No items available.
                 </div>
-            </form>
+            @endif
         </div>
     </div>
 </div>

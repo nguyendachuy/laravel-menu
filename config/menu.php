@@ -5,41 +5,76 @@
  *
  * This file contains various configuration options for the package.
  * You can customize the middleware, table names, route prefix, and more.
- *
- * @return array
  */
 
 return [
-    /* you can add your own middleware here */
+    /*
+    |--------------------------------------------------------------------------
+    | Menu Middleware
+    |--------------------------------------------------------------------------
+    |
+    | You can add your own middleware here. This middleware will be applied
+    | to all routes registered by the package.
+    |
+    */
     'middleware' => [],
 
-    /* you can set your own table prefix here */
+    /*
+    |--------------------------------------------------------------------------
+    | Database Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure database table prefix and table names.
+    |
+    */
     'table_prefix' => 'admin_',
-
-    /* you can set your own table names */
     'table_name_menus' => 'menus',
-
     'table_name_items' => 'menu_items',
 
-    /* you can set your route path*/
+    /*
+    |--------------------------------------------------------------------------
+    | Route Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Set the route prefix for all menu-related routes.
+    |
+    */
     'route_prefix' => 'nguyendachuy',
 
-    /* here you can make menu items visible to specific roles */
+    /*
+    |--------------------------------------------------------------------------
+    | Role Access Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Enable or disable role-based permissions for menu items.
+    | When enabled, specify the roles table details.
+    |
+    */
     'use_roles' => false,
-
-    /* If use_roles = true above then must set the table name, primary key and title field to get roles details */
     'roles_table' => 'roles',
+    'roles_pk' => 'id',        // Primary key of the roles table
+    'roles_title_field' => 'name', // Display name (field) of the roles table
 
-    'roles_pk' => 'id', // primary key of the roles table
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure caching for menu items to improve performance.
+    |
+    */
+    'cache_enabled' => false,  // Enable or disable menu caching
+    'cache_key_prefix' => 'menu', // Prefix for cache keys
+    'cache_ttl' => 60,         // Cache time-to-live in minutes
 
-    'roles_title_field' => 'name', // display name (field) of the roles table
-
-    /**
-     * Cache configuration
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Legacy configuration for backward compatibility
+    |--------------------------------------------------------------------------
+    */
     'cache' => [
-        'enabled' => false, // enable or disable cache
-        'minutes' => 60, // cache time in minutes (default: 60)
-        'prefix' => 'menu', // prefix for cache key
-    ],
+        'enabled' => false,    // Enable or disable cache (legacy format)
+        'minutes' => 60,       // Cache time in minutes (legacy format)
+        'prefix' => 'menu',    // Prefix for cache key (legacy format)
+    ]
 ];

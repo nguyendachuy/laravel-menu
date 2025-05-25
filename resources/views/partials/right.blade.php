@@ -1,75 +1,66 @@
-<div class="card mt-2">
+<div class="card">
     <div class="card-body">
         <div class="row">
             <div class="col-md-12">
-                <form class="form-inline" action="" method="post">
-                    <div class="form-group">
-                        <label for="email" class="mr-sm-2">Name: </label>
-                        <input name="menu-name" id="menu-name" type="text" 
-                        class="form-control menu-name regular-text menu-item-textbox" 
-                        title="Enter menu name" value="@if(isset($indmenu)){{$indmenu->name}}@endif">
-                        @if(request()->has('action'))
-                            <button type="button" onclick="createNewMenu()" name="save_menu" 
-                                class="btn btn-primary menu-save ml-2">Create Menu</button>
-                        @elseif(request()->has('menu'))
-                            <button type="button" onclick="actualizarMenu(false)" name="save_menu"
-                                class="btn btn-primary menu-save ml-2">Save Menu</button>
-                        @else
-                            <button type="button" onclick="createNewMenu()" name="save_menu" 
-                                class="btn btn-primary menu-save ml-2">Create Menu</button>
-                        @endif
+                @if(request()->has('menu') && request()->input('menu') == '0')
+                    <div class="bg-white shadow rounded border border-gray-200">
+                        <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                            <h5 class="font-medium text-gray-700">Menu Structure</h5>
+                        </div>
+                        <div class="p-5">
+                            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4">
+                                Please create a new menu by entering a name on the left and clicking "Create Menu".
+                            </div>
+                        </div>
                     </div>
-                </form>
-                <hr>
-            </div>
-            <div class="col-md-12">
-                @if(request()->get('menu') != 0 && isset($menus) && count($menus) > 0)
-                <div class="jumbotron jumbotron-fluid p-2">
-                    <div class="container">
-                        <h3>Menu Structure</h3>
-                        <p class="lead">Place each item in the order you prefer. Click <i class="fa fa-pencil-square-o" aria-hidden="true"></i> to the right of the item to display more configuration options.</p>
-                    </div>
-                </div>
-                @elseif(request()->get('menu') == 0)
-                <div class="jumbotron jumbotron-fluid p-2">
-                    <div class="container">
-                        <h3>Menu Creation</h3>
-                        <p class="lead">Please enter the name and select "Create menu" button</p>
-                    </div>
-                </div>
-                @else
-                <div class="jumbotron jumbotron-fluid p-2">
-                    <div class="container">
-                        <h3>Create Menu Item</h3>
-                        <p class="lead"></p>
-                    </div>
-                </div>
-                @endif
+                @elseif(isset($indmenu))
+                    <div class="bg-white shadow rounded border border-gray-200">
+                        <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                            <h5 class="font-medium text-gray-700">Menu Structure</h5>
+                            
+                            <button type="button" onclick="deleteMenu();" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded focus:outline-none focus:ring-2 focus:ring-red-300">
+                                Delete Menu
+                            </button>
+                        </div>
+                        <div class="p-5">
+                            <div class="mb-4 flex space-x-4">
+                                <div class="w-1/2">
+                                    <label for="menu-name" class="block mb-2 text-sm font-medium text-gray-700">Menu Name</label>
+                                    <input type="text" id="menu-name" name="menu-name" value="{{$indmenu->name}}" class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div class="w-1/2">
+                                    <label for="menu-class" class="block mb-2 text-sm font-medium text-gray-700">Menu Class (Optional)</label>
+                                    <input type="text" id="menu-class" name="menu-class" value="{{$indmenu->class ?? ''}}" class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
 
-                <div id="accordion" class="">
-                    @if(isset($menus) && count($menus) > 0)
-                    <div class="dd nestable-menu" id="nestable">
-                        <ol class="dd-list">	
-                            @foreach($menus as $key => $m)
-                                @include('nguyendachuy-menu::partials.loop-item', ['key' => $key])
-                            @endforeach
-                        </ol>
+                            <div class="mt-6 mb-4">
+                                <p class="text-sm text-gray-600 mb-4">Drag and drop the menu items to rearrange them. Drag items slightly to the right to create child items.</p>
+                                
+                                <div class="dd" id="nestable">
+                                    <ol class="dd-list">
+                                        @if(isset($menus) && count($menus) > 0)
+                                            @foreach($menus as $m)
+                                                @include('nguyendachuy-menu::partials.loop-item', ['item' => $m])
+                                            @endforeach
+                                        @else
+                                            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+                                                No menu items. Add your first item using the form on the left.
+                                            </div>
+                                        @endif
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button type="button" onclick="updateItem();" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded focus:outline-none focus:ring-2 focus:ring-green-300 mr-2">
+                                    Update Menu
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    @endif
-                </div>
+                @endif
             </div>
         </div>
     </div>
-    @if(request()->get('menu') != 0)
-    <div class="card-footer">
-        <button type="button" class="btn btn-danger btn-sm submitdelete deletion menu-delete" 
-            onclick="deleteMenu()" href="javascript:void(9)">Delete Menu
-        </button>
-        @if(isset($menus) && count($menus) > 0)
-        <button type="button" class="btn btn-info btn-sm" 
-            onclick="updateItem()" href="javascript:void(9)">Update All Item
-        </button>
-        @endif
-    </div>
-    @endif
 </div>

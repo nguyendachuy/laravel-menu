@@ -21,6 +21,10 @@ Route::group([
         'as' => 'update-item',
         'uses' => 'MenuController@updateItem'
     ));
+    Route::post('reorder-items', array(
+        'as' => 'reorder-items',
+        'uses' => 'MenuController@reorderItems'
+    ));
 
     /**
      * menu

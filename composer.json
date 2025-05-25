@@ -1,29 +1,24 @@
 {
   "name": "nguyendachuy/laravel-menu",
-  "description": "Laravel Menu Builder | Drag & Drop | Bootstrap | Laravel 7 | Laravel 8 | Laravel 9 | Laravel 10 | Laravel 11",
-  "keywords": [
-    "Laravel",
-    "Menu",
-    "Bootstrap",
-    "Builder",
-    "Drag",
-    "Drop"
-  ],
+  "description": "Laravel Menu Manager with drag and drop, roles and multilevel support",
+  "license": "MIT",
   "authors": [
     {
       "name": "Nguyen Dac Huy",
-      "email": "huy.cit@gmail.com",
-      "role": "Developer"
+      "email": "huy.cit@gmail.com"
     }
   ],
   "require": {
-    "php": ">=7.2.5",
-    "illuminate/support": "7.* || 8.* || 9.* || 10.* || 11.*"
+    "php": "^7.3|^8.2",
+    "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0"
   },
   "autoload": {
     "psr-4": {
-      "NguyenHuy\\Menu\\": "src"
-    }
+      "NguyenHuy\\Menu\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
   },
   "extra": {
     "laravel": {
@@ -34,7 +29,5 @@
         "Menu": "NguyenHuy\\Menu\\Facades\\Menu"
       }
     }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+  }
 }

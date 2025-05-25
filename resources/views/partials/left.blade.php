@@ -1,77 +1,87 @@
-@if(!empty(request()->get('menu')))
-<div id="accordion-left">
-    @php
-        // $blogs = \App\Blog::get(['id', 'title'])->map(function($blog){
-        //     return [
-        //         'url' => $blog->getLink(),
-        //         'icon' => '',
-        //         'label' => $blog->title,
-        //     ];
-        // });
-        $pages = [
-            [
-                'url' => '/page1',
-                'icon' => '',
-                'label' => 'Page 1',
-            ],
-            [
-                'url' => '/page2',
-                'icon' => '',
-                'label' => 'Page 2',
-            ],
-            [
-                'url' => '/page3',
-                'icon' => '',
-                'label' => 'Page 2',
-            ],
-            [
-                'url' => '/page4',
-                'icon' => '',
-                'label' => 'Page 4',
-            ],
-            [
-                'url' => '/page5',
-                'icon' => '',
-                'label' => 'Page 5',
-            ]
-        ];
-    @endphp
-    @include('nguyendachuy-menu::accordions.default', [
-        'name' => 'Pages', 
-        'urls' => $pages, 
-        'show' => true
-    ])
-    @php
-    $categories = [
-            [
-                'url' => '/category1',
-                'icon' => '',
-                'label' => 'Category 1',
-            ],
-            [
-                'url' => '/category2',
-                'icon' => '',
-                'label' => 'Category 2',
-            ],
-            [
-                'url' => '/category3',
-                'icon' => '',
-                'label' => 'Category 2',
-            ],
-            [
-                'url' => '/category4',
-                'icon' => '',
-                'label' => 'Category 4',
-            ],
-            [
-                'url' => '/category5',
-                'icon' => '',
-                'label' => 'Category 5',
-            ]
-        ];
-    @endphp
-    @include('nguyendachuy-menu::accordions.default', ['name' => 'Categories', 'urls' => $categories])
+@if (request()->has('menu') && request()->input('menu') == '0')
+    <!-- Create Menu form -->
+    <div class="bg-white shadow rounded border border-gray-200">
+        <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+            <h5 class="font-medium text-gray-700">Create a new menu</h5>
+        </div>
+        <div class="p-4">
+            <div class="mb-4">
+                <label for="menu-name" class="block mb-2 text-sm font-medium text-gray-700">Menu Name</label>
+                <input type="text" id="menu-name" name="menu-name"
+                    class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="mb-4">
+                <label for="menu-class" class="block mb-2 text-sm font-medium text-gray-700">Menu Class
+                    (Optional)</label>
+                <input type="text" id="menu-class" name="menu-class"
+                    class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <button type="button" onclick="createNewMenu();"
+                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    Create Menu
+                </button>
+            </div>
+        </div>
+    </div>
+@elseif(isset($indmenu))
+    <!-- Add Items form -->
+    <div class="bg-white shadow rounded border border-gray-200">
+        <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+            <h5 class="font-medium text-gray-700">Add Menu Items</h5>
+        </div>
+        <div class="p-4">
+            <form id="form-add-item" method="post">
+                <div class="mb-4">
+                    <label for="label" class="block mb-2 text-sm font-medium text-gray-700">Label</label>
+                    <input type="text" id="label" name="label"
+                        class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="url" class="block mb-2 text-sm font-medium text-gray-700">URL</label>
+                    <input type="text" id="url" name="url"
+                        class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        value="http://">
+                </div>
+                <div class="mb-4">
+                    <label for="icon" class="block mb-2 text-sm font-medium text-gray-700">Icon Class
+                        (Optional)</label>
+                    <input type="text" id="icon" name="icon" placeholder="fa fa-example"
+                        class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                @if (config('menu.use_roles'))
+                    <div class="mb-4">
+                        <label for="role" class="block mb-2 text-sm font-medium text-gray-700">Role</label>
+                        <select id="role" name="role"
+                            class="border border-gray-300 rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="0">Select Role</option>
+                            @foreach ($roles as $role)
+                                <option value="{{ $role->$role_pk }}">{{ ucfirst($role->$role_title_field) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+                <div>
+                    <button type="button" onclick="addItemMenu(this, 'default');"
+                        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        Add to Menu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    @include('nguyendachuy-menu::accordions.add-link', ['name' => 'Add Link'])
-</div>
+    <div id="accordion-left">
+        {{-- Display all registered menu sections --}}
+        @if (isset($menuSections) && count($menuSections) > 0)
+            @foreach ($menuSections as $section)
+                @include('nguyendachuy-menu::accordions.default', [
+                    'name' => $section['name'],
+                    'urls' => $section['items'],
+                    'show' => $section['show'] ?? false,
+                ])
+            @endforeach
+        @endif
+
+    </div>
 @endif

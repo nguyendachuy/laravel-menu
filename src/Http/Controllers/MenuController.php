@@ -4,128 +4,190 @@ namespace NguyenHuy\Menu\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use NguyenHuy\Menu\Events\CreatedMenuEvent;
 use NguyenHuy\Menu\Events\DestroyMenuEvent;
 use NguyenHuy\Menu\Events\UpdatedMenuEvent;
+use NguyenHuy\Menu\Http\Requests\CreateMenuRequest;
+use NguyenHuy\Menu\Http\Requests\CreateMenuItemRequest;
+use NguyenHuy\Menu\Http\Requests\UpdateMenuRequest;
+use NguyenHuy\Menu\Http\Requests\UpdateMenuItemRequest;
+use NguyenHuy\Menu\Repositories\MenuRepository;
 use NguyenHuy\Menu\Models\Menus;
 use NguyenHuy\Menu\Models\MenuItems;
 
 class MenuController extends Controller
 {
-    public function createNewMenu(Request $request)
-    {
-        $menu = new Menus();
-        $menu->name = $request->input('name');
-        $menu->class = $request->input('class', null);
-        $menu->save();
+    protected $menuRepository;
 
+    public function __construct(MenuRepository $menuRepository)
+    {
+        $this->menuRepository = $menuRepository;
+    }
+
+    /**
+     * Create a new menu
+     * 
+     * @param CreateMenuRequest $request
+     * @return JsonResponse
+     */
+    public function createNewMenu(CreateMenuRequest $request): JsonResponse
+    {
+        $menu = $this->menuRepository->createMenu($request->validated());
+        
         event(new CreatedMenuEvent($menu));
 
         return response()->json([
-            'resp' => $menu->id
+            'resp' => $menu->id,
+            'message' => 'Menu created successfully'
         ], 200);
     }
 
-    public function destroyMenu(Request $request)
+    /**
+     * Delete a menu
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function destroyMenu(Request $request): JsonResponse
     {
-        $menudelete = Menus::findOrFail($request->input('id'));
-        $menudelete->delete();
+        $menu = Menus::findOrFail($request->input('id'));
+        $this->menuRepository->deleteMenu($menu);
 
-        event(new DestroyMenuEvent($menudelete));
+        event(new DestroyMenuEvent($menu));
 
         return response()->json([
-            'resp' => 'You delete this item'
+            'resp' => 'Menu deleted successfully'
         ], 200);
     }
 
-    public function generateMenuControl(Request $request)
+    /**
+     * Update menu and its items
+     * 
+     * @param UpdateMenuRequest $request
+     * @return JsonResponse
+     */
+    public function generateMenuControl(UpdateMenuRequest $request): JsonResponse
     {
-        $menu = Menus::findOrFail($request->input('idMenu'));
-        $menu->name = $request->input('menuName');
-        $menu->class = $request->input('class', null);
-        $menu->save();
+        $menu = $this->menuRepository->updateMenu($request->input('idMenu'), [
+            'name' => $request->input('menuName'),
+            'class' => $request->input('class')
+        ]);
+        
         if (is_array($request->input('data'))) {
-            foreach ($request->input('data') as $key => $value) {
-                $menuitem = MenuItems::findOrFail($value['id']);
-                $menuitem->parent = $value['parent_id'] ?? 0;
-                $menuitem->sort = $key;
-                $menuitem->depth = $value['depth'] ?? 1;
-                if (config('menu.use_roles')) {
-                    $menuitem->role_id = $request->input('role_id');
-                }
-                $menuitem->save();
-            }
+            // Pass the complete data structure with depth information
+            $this->menuRepository->updateMenuItems($request->input('data'));
         }
+        
+        event(new UpdatedMenuEvent($menu));
+        
         return response()->json([
-            'resp' => 1
+            'resp' => 1,
+            'message' => 'Menu updated successfully'
         ], 200);
     }
 
-    public function createItem(Request $request)
+    /**
+     * Create menu items
+     * 
+     * @param CreateMenuItemRequest $request
+     * @return JsonResponse
+     */
+    public function createItem(CreateMenuItemRequest $request): JsonResponse
     {
         if ($request->has('data')) {
-            foreach ($request->post('data') as $key => $value) {
-                $menuitem = new MenuItems();
-                $menuitem->label = $value['label'];
-                $menuitem->link = $value['url'];
-                $menuitem->icon = $value['icon'];
-                if (config('menu.use_roles')) {
-                    $menuitem->role_id = $value['role'] ?? 0;
-                }
-                $menuitem->menu = $value['id'];
-                $menuitem->sort = MenuItems::getNextSortRoot($value['id']);
-                $menuitem->save();
-            }
+            $this->menuRepository->createMenuItems($request->input('data'));
         }
 
         return response()->json([
-            'resp' => 1
+            'resp' => 1,
+            'message' => 'Menu items created successfully'
         ], 200);
     }
 
-    public function updateItem(Request $request)
+    /**
+     * Update menu item
+     * 
+     * @param UpdateMenuItemRequest $request
+     * @return JsonResponse
+     */
+    public function updateItem(UpdateMenuItemRequest $request): JsonResponse
     {
         $dataItem = $request->input('dataItem');
+        
         if (is_array($dataItem)) {
-            foreach ($dataItem as $value) {
-                $menuitem = MenuItems::findOrFail($value['id']);
-                $menuitem->label = $value['label'];
-                $menuitem->link = $value['link'];
-                $menuitem->class = $value['class'];
-                $menuitem->icon = $value['icon'];
-                $menuitem->target = $value['target'];
-                if (config('menu.use_roles')) {
-                    $menuitem->role_id = $value['role_id'] ? $value['role_id'] : 0;
-                }
-                $menuitem->save();
-            }
+            $this->menuRepository->bulkUpdateMenuItems($dataItem);
         } else {
-            $menuitem = MenuItems::findOrFail($request->input('id'));
-            $menuitem->label = $request->input('label');
-            $menuitem->link = $request->input('url');
-            $menuitem->class = $request->input('clases');
-            $menuitem->icon = $request->input('icon');
-            $menuitem->target = $request->input('target');
-            if (config('menu.use_roles')) {
-                $menuitem->role_id = $request->input('role_id') ? $request->input('role_id') : 0;
-            }
-            $menuitem->save();
+            $this->menuRepository->updateMenuItem($request->except('_token'));
         }
 
-        event(new UpdatedMenuEvent($dataItem));
+        event(new UpdatedMenuEvent($dataItem ?? $request->except('_token')));
 
         return response()->json([
-            'resp' => 1
+            'resp' => 1,
+            'message' => 'Menu item updated successfully'
         ], 200);
     }
 
-    public function destroyItem(Request $request)
+    /**
+     * Delete menu item
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function destroyItem(Request $request): JsonResponse
     {
-        $menuitem = MenuItems::findOrFail($request->input('id'));
-        $menuitem->delete();
+        $this->menuRepository->deleteMenuItem($request->input('id'));
 
         return response()->json([
-            'resp' => 1
+            'resp' => 1,
+            'message' => 'Menu item deleted successfully'
         ], 200);
+    }
+    
+    /**
+     * Reorder menu items
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function reorderItems(Request $request): JsonResponse
+    {
+        if ($request->has('items') && is_array($request->input('items'))) {
+            $items = $request->input('items');
+            
+            // Process each item to update its sort order, parent, and depth
+            foreach ($items as $item) {
+                if (isset($item['id']) && isset($item['sort'])) {
+                    $updateData = [
+                        'id' => $item['id'],
+                        'sort' => $item['sort']
+                    ];
+                    
+                    // Add parent if provided
+                    if (isset($item['parent'])) {
+                        $updateData['parent'] = $item['parent'];
+                    }
+                    
+                    // Add depth if provided
+                    if (isset($item['depth'])) {
+                        $updateData['depth'] = $item['depth'];
+                    }
+                    
+                    // Update the item
+                    $this->menuRepository->updateMenuItem($updateData);
+                }
+            }
+            
+            return response()->json([
+                'resp' => 1,
+                'message' => 'Menu items reordered successfully'
+            ], 200);
+        }
+        
+        return response()->json([
+            'resp' => 0,
+            'message' => 'Invalid data provided'
+        ], 400);
     }
 }
