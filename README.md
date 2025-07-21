@@ -2,7 +2,7 @@
 [![Latest Stable Version](https://poser.pugx.org/nguyendachuy/laravel-menu/v)](//packagist.org/packages/nguyendachuy/laravel-menu) [![Total Downloads](https://poser.pugx.org/nguyendachuy/laravel-menu/downloads)](//packagist.org/packages/nguyendachuy/laravel-menu) [![Latest Unstable Version](https://poser.pugx.org/nguyendachuy/laravel-menu/v/unstable)](//packagist.org/packages/nguyendachuy/laravel-menu) [![License](https://poser.pugx.org/nguyendachuy/laravel-menu/license)](//packagist.org/packages/nguyendachuy/laravel-menu)
 
 
-![Laravel drag and drop menu](https://raw.githubusercontent.com/nguyendachuy/laravel-menu/master/screenshot.png)
+![Laravel drag and drop menu](https://raw.githubusercontent.com/nguyendachuy/laravel-menu/upgrade-version/screenshot.png)
 
 A modern, responsive drag-and-drop menu builder for Laravel with role-based permissions, caching, and optimized JavaScript. The package features an intuitive drag-and-drop interface for creating and managing multi-level navigation menus.
 
